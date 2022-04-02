@@ -1,0 +1,296 @@
+/*
+   Name : A program for providing a game which users have their own accounts to sign in,play games, view and clean game playing history.
+   Copy right : Free
+   Author : Wang Yubo
+   Description : This program is able to let different users who can sign and log in their own security account and play games. Meanwhile, they can view their history records and clear them.
+   */
+
+
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include<string.h>// the packages will be used in the program 
+
+struct storage // Define a structure in order to store users' information
+{
+	char username[100];
+	char password[100];
+	int win;
+	int lose;
+	int draw;
+};
+
+void option() // A function which display the first selection interface
+{
+	printf("**************************************************************************\n");
+	printf("********************************  ABC GAME  ******************************\n");
+	printf("*******************  Produced By 2019 Balloon Company  ********************\n");
+	printf("*************************  All Rights Reserved  **************************\n");
+	printf("**************************************************************************\n");
+	printf("*******************************  1. Sign In  *****************************\n");
+	printf("*******************************  2. Log In   *****************************\n");
+	printf("*******************************  3. Exit     *****************************\n");
+	printf("**************************************************************************\n");
+}
+
+void game() // A function which display the second selection interface
+{
+	printf("**************************************************************************\n");
+	printf("*************************  1. Start Game         *************************\n");
+	printf("*************************  2. View Game  History  ************************\n");
+	printf("*************************  3. Clear Game HIstory *************************\n");
+	printf("*************************  4. Exit               *************************\n");
+	printf("**************************************************************************\n");
+}
+
+int main(void)//define the main function
+{
+	int choice_1, choice_2, test, i = 0, total = 0, t;
+	int computer, n_user, c, s = 1;/*define the integer type of variable: choice_1---a skip variable which leads to 'case' of first selection interface;
+								   choice_2---a skip variable which leads to 'case' of second selection interface;
+								   test---a varibale to help to empty the buffer;
+								   i--- a variable to mark specific user;
+								   total---a variable to count the number of all users;
+								   t---a variable to lead to a 'while' loop;
+								   computer---a variable to convert a time-based random number to a capital letter;
+								   n_user---convert what users input to a integer, which will make the comparision easier;
+								   c---a integer to judge whether users win or not;
+								   s---a variable to lead to another 'while' loop;*/
+	struct storage users[100];// name a structure as users;
+	char in_username[100], in_password[100];// define a string in which the users input of username and password will be stored; 
+	char user;// store which character users choose in game part;
+
+
+	users[i].win = 0;
+	users[i].lose = 0;
+	users[i].draw = 0;//initialize the variables which record the rounds of game;
+
+	FILE *fp;// define and create a file
+	t = 1;
+	while (t == 1)
+	{
+	part2:	option();// call the 'option' function
+		while ((scanf("%d", &choice_1) != 1) || (choice_1< 1) || (choice_1> 3))//let user choose the mode they want
+		{
+			printf("**************************************************************************\n");
+			printf("***************  It seems you enter a wrong number ***********************\n");
+			printf("***********************  Please try again   ******************************\n");
+			printf("**************************************************************************\n");
+
+			while ((test = getchar()) != EOF &&test != '\n')
+			{
+				;
+			}//empty the buffer;
+		}
+		switch (choice_1)// strcture 'switch'
+		{
+		case 1:
+			if ((fp = fopen("game.txt", "r+")) == NULL)//test whether the file can be opened, warning if it fails.
+			{
+				printf("cannot open game.dat\n");
+				exit(0);
+			}
+			while (t == 1)
+			{
+				printf("**************************************************************************\n");
+				printf("******************  Please choose a name for you  ************************\n");
+				printf("**************************************************************************\n");
+				scanf("%s", users[i].username);//receive the input
+				fscanf(fp, "%s", users[i].username);//store the input into file
+				printf("**************************************************************************\n");
+				printf("************  Please set a password for your account  ********************\n");
+				printf("**************************************************************************\n");
+
+				scanf("%s", users[i].password);//receive the input
+				fscanf(fp, "%s", users[i].password);//store the input into file
+
+				fclose(fp);//close the file
+				i++;
+				total = i;
+				break;
+			}
+			break;
+		case 2:
+			if ((fp = fopen("game.txt", "r")) == NULL) //test whether the file can be opened, warning if it fails.
+			{
+				printf("cannot open game.dat\n");
+				exit(0);
+			}
+			printf("**************************************************************************\n");
+			printf("******************  Please enter your username  **************************\n");
+			printf("**************************************************************************\n");
+			scanf("%s", in_username);
+
+			for (i = 0; i < total; i++)
+			if (strcmp(in_username, users[i].username) == 0) //compare the users' names in the file with the input 
+			{
+				break;
+			}
+
+			if (i != total)// a step to judge wheter a account exist
+			{
+
+				printf("**************************************************************************\n");
+				printf("******************  Please enter your password  **************************\n");
+				printf("**************************************************************************\n");
+				scanf("%s", in_password);
+
+				if (strcmp(in_password, users[i].password) == 0)//compare the passwords in the file with the input ;
+				{
+					printf("**************************************************************************\n");
+					printf("***************************  Welcome, user  %s  ***********************\n", users[i].username);//sign in successfully;
+					goto part1;
+				}
+				else
+				{
+					printf("**************************************************************************\n");
+					printf("**************  Sorry, your password is incorrect   **********************\n");
+
+				}
+				fclose(fp);
+			}
+			else
+			{
+				printf("**************************************************************************\n");
+				printf("************  Sorry, I'm afraid you did not sign in   ********************\n");
+			}
+			break;
+		part1: game();
+
+			while ((scanf("%d", &choice_2) != 1) || (choice_2< 1) || (choice_2> 4))
+			{
+				printf("**************************************************************************\n");
+				printf("***************  It seems you enter a wrong number ***********************\n");
+				printf("***********************  Please try again   ******************************\n");
+				printf("**************************************************************************\n");
+				while ((test = getchar()) != EOF &&test != '\n')//empty the buffer;
+				{
+					;
+				}
+			}
+
+			switch (choice_2)
+			{
+			case 1:
+				fflush(stdin);
+				if ((fp = fopen("game.txt", "w")) == NULL)//test whether the file can be opened, warning if it fails.
+				{
+					printf("cannot open game.dat\n");
+					exit(0);
+				}
+				printf("**************************************************************************\n");
+				printf("********************************  RULES   ********************************\n");
+				printf("********  1. This is a game that only 'A','B','C' are acceptable    ******\n");
+				printf("********  2. In the game, A<B ,B<C ,C<A                             ******\n");
+				printf("********  3. Now, you can try to enter one of the characters above  ******\n");
+				printf("**************************************************************************\n");
+
+				scanf("%c", &user);//convert what users input to numbers;
+				if (user == 'A')
+					n_user = 0;
+				if (user == 'B')
+					n_user = 1;
+				if (user == 'C')
+					n_user = 2;
+				srand((unsigned)time(NULL));
+				computer = rand() % 3;// use the function to generate the number based on the time
+				if (computer == 0)
+				{
+
+					printf("**************************************************************************\n");
+					printf("************************  Computer chose:  A  ****************************\n");
+					printf("**************************************************************************\n");
+				}
+				if (computer == 1)
+				{
+					printf("**************************************************************************\n");
+					printf("************************  Computer chose:  B  ****************************\n");
+					printf("**************************************************************************\n");
+				}
+				if (computer == 2)
+				{
+					printf("**************************************************************************\n");
+					printf("************************  Computer chose:  C  ****************************\n");
+					printf("**************************************************************************\n");
+				}
+				c = n_user - computer;// distinguish the result by the difference of two numbers;
+				if (c == 1 || c == -2)
+				{
+					printf("******************************  You WIN  *********************************\n");
+
+					(users[i].win)++;
+				}
+				if (c == -1 || c == 2)
+				{
+					printf("******************************  You LOSE  ********************************\n");
+
+					users[i].lose++;
+				}
+				if (c == 0)
+				{
+					printf("*******************************  DRAW  ***********************************\n");
+
+					users[i].draw++;
+				}
+
+				fscanf(fp, "%d", users[i].win);
+				fscanf(fp, "%d", users[i].lose);
+				fscanf(fp, "%d", users[i].draw);//store the rounds to the structure
+				goto part1;
+
+			case 2:
+				printf("**************************************************************************\n");
+				printf("********  Dear user %s,                              *********************\n", users[i].username);
+				printf("********                                            **********************\n");
+				printf("********  the overall rounds you played:      %d     **********************\n", users[i].win + users[i].lose + users[i].draw);
+				printf("********  the rounds you win:                 %d     **********************\n", users[i].win);
+				printf("********  the rounds you lose:                %d     **********************\n", users[i].lose);
+				printf("********  the rounds you draw:                %d     **********************\n", users[i].draw);//print the results
+
+				if ((users[i].win > users[i].lose) && (users[i].win > users[i].draw))
+				{
+					printf("**************************************************************************\n");
+					printf("************************      you win overall       **********************\n");
+
+				}
+				else if ((users[i].draw > users[i].lose) && (users[i].draw > users[i].win))
+				{
+					printf("**************************************************************************\n");
+					printf("***********************      you draw overall       **********************\n");
+
+				}
+				else if ((users[i].lose > users[i].win) && (users[i].lose > users[i].draw))
+				{
+					printf("**************************************************************************\n");
+					printf("***********************     you lose overall        **********************\n");
+
+				}
+				else
+				{
+					printf("**************************************************************************\n");
+					printf("***************  you neither win nor lose or draw   **********************\n");
+
+				}
+				goto part1;
+
+			case 3:
+				users[i].win = 0;
+				users[i].lose = 0;
+				users[i].draw = 0;//set all the records to 0 to clear the history
+				goto part1;
+				{
+					printf("**************************************************************************\n");
+					printf("************  All the records cleared successfully     *******************\n");
+					printf("**************************************************************************\n");
+				}
+
+			case 4:
+				goto part2;
+			}
+		case 3:
+			exit(0);
+		}
+	}
+	return 0;
+}
